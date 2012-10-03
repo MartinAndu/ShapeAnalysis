@@ -1,0 +1,42 @@
+
+	/*SolidEdgeIterator edges(&newMesh);
+	for (int k=0; k < atoi(argv[3]) && !edges.end(); ++edges, k++) {
+		//         
+		//        C = 1/8
+		//       / \
+		//      /   \
+		//     /     \
+		//    /       \
+		// = A----V----B = 3/8
+		//3/8 \       /
+		//     \     /
+		//      \   /
+		//       \ /
+		//        D = 1/8
+		
+		Solid::tEdge edge = *edges;
+
+		Solid::tVertex va,vb,vc,vd;
+		
+		edge->get_vertices(va,vb);
+
+		HalfEdge *he = edge->halfedge(0);
+
+		Face *f1 = he->face();
+
+		FaceVertexIterator vrts(f1);
+
+		for (;!vrts.end();++vrts) {
+			Solid::tVertex vrt = *vrts;
+			if ((vrt!=va)&&(vrt!=vb)) {
+				vc = vrt;
+				break;
+			}
+		}
+		
+
+
+		//Face *f2 = he->he_sym()->face();
+
+	}*/
+	
