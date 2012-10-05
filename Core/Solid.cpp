@@ -1197,7 +1197,8 @@ Vertex * Solid::edgeSplit( Edge * e )
 
 	m_edges.remove( e );
 
-
+	// MODIFIED!!!
+	/*
 	List<Face> new_faces;
 
 	for( int j = 0; j < 2; j ++ )
@@ -1236,6 +1237,7 @@ Vertex * Solid::edgeSplit( Edge * e )
 		int vid[3];
 		tVertex w[3];
 		w[0] = nv; w[1] = v[0]; w[2] = v[1];
+
 		for( k = 0; k < 3; k ++ )
 		{
 			vid[k] = w[k]->id(); 
@@ -1244,11 +1246,15 @@ Vertex * Solid::edgeSplit( Edge * e )
 		Face * nf = createFace( vid, ++max_fid );
 		new_faces.Append( nf );
 
-		w[0] = nv; w[1] = v[1]; w[2] = v[2];
+		w[0] = nv; 
+		w[1] = v[1]; 
+		w[2] = v[2];
+
 		for( k = 0; k < 3; k ++ )
 		{
 			vid[k] = w[k]->id(); 
 		}	
+
 		nf = createFace( vid, ++ max_fid );
 		new_faces.Append( nf );
 	}	
@@ -1272,7 +1278,7 @@ Vertex * Solid::edgeSplit( Edge * e )
 			}
 			he = he->he_next();
 		}while( he != f->halfedge() );
-	}
+	}*/
 
 	delete e;
 	return nv;	

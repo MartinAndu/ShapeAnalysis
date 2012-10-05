@@ -1,14 +1,18 @@
-﻿Build started 02/10/2012 23:35:58.
+﻿Build started 05/10/2012 02:12:32.
      1>Project "C:\Users\Leo\Documents\Visual Studio 2010\Projects\subdivision\Subdivision\Subdivision.vcxproj" on node 2 (build target(s)).
      1>InitializeBuildStatus:
-         Touching "Debug\Subdivision.unsuccessfulbuild".
+         Creating "Debug\Subdivision.unsuccessfulbuild" because "AlwaysCreate" was specified.
        ClCompile:
          c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /I..\Core /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _UNICODE /D UNICODE /D DEBUG /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt Subdivision.cpp
          Subdivision.cpp
-     1>c:\users\leo\documents\visual studio 2010\projects\subdivision\subdivision\subdivision.cpp(176): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>c:\users\leo\documents\visual studio 2010\projects\subdivision\subdivision\subdivision.cpp(216): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>c:\users\leo\documents\visual studio 2010\projects\subdivision\subdivision\subdivision.cpp(79): warning C4101: 'v33' : unreferenced local variable
+     1>c:\users\leo\documents\visual studio 2010\projects\subdivision\subdivision\subdivision.cpp(78): warning C4101: 'e2' : unreferenced local variable
+     1>c:\users\leo\documents\visual studio 2010\projects\subdivision\subdivision\subdivision.cpp(78): warning C4101: 'e3' : unreferenced local variable
+     1>c:\users\leo\documents\visual studio 2010\projects\subdivision\subdivision\subdivision.cpp(79): warning C4101: 'v32' : unreferenced local variable
+     1>c:\users\leo\documents\visual studio 2010\projects\subdivision\subdivision\subdivision.cpp(78): warning C4101: 'e1' : unreferenced local variable
+     1>c:\users\leo\documents\visual studio 2010\projects\subdivision\subdivision\subdivision.cpp(79): warning C4101: 'v31' : unreferenced local variable
+     1>c:\users\leo\documents\visual studio 2010\projects\subdivision\subdivision\subdivision.cpp(440): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
                  c:\program files (x86)\microsoft visual studio 10.0\vc\include\stdio.h(325) : see declaration of 'sscanf'
-     1>c:\users\leo\documents\visual studio 2010\projects\subdivision\subdivision\subdivision.cpp(111): warning C4101: 'edge' : unreferenced local variable
        ManifestResourceCompile:
          All outputs are up-to-date.
        Link:
@@ -41,4 +45,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:01.24
+Time Elapsed 00:00:01.30
