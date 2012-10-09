@@ -21,11 +21,10 @@
 #define VCP 5
 
 
-// TODO: 1. boundaries, 2. check odd vert calcs
-
-
 
 using namespace MeshLib;
+
+double* alphas;
 
 double getAlpha(int n){
 	double answer;
@@ -34,6 +33,7 @@ double getAlpha(int n){
 		answer = (0.625 - (center * center)) / (double) n;
 	} else {
 		answer = 3.0 / 16.0;
+		//if (n<3) std::cout<<"\r\nBoundary";
 	}
 	return answer;
 }
@@ -144,13 +144,13 @@ Solid* firstPass(Solid* original) {
 			else {
 				// first: split edge, create vertex	
 				v3 = delegate.edgeSplit(mesh, mesh->idEdge(v1->id(),v2->id()));
-				v3->point() = ((v1->point()+v2->point())*0.5);	
+				v3->point() = ((v1->point()+v2->point())*(0.252));	// juicy part
 				v3->id() = ++newVertIds;			
 				// second: update lookup table
 				assert(marked[IDX(v1->id(),v2->id())] < 0);
 				marked[IDX(v1->id(),v2->id())]= v3->id();
 
-				// opposite of v3
+				// opposite of v3, used to update odd vertices
 				oppositeVertOfEdge[v3->id()] = vOp;
 			}
 
@@ -180,28 +180,17 @@ Solid* firstPass(Solid* original) {
 		newFaceVertIds[currentFace+(VAP*nFace)] = vap->id();
 		newFaceVertIds[currentFace+(VBP*nFace)] = vbp->id();
 		newFaceVertIds[currentFace+(VCP*nFace)] = vcp->id();
-
-
-		
-		// create new triangles
-	/*	int tri_A_Cp_Bp [3] = {va->id(),vcp->id(),vbp->id() }; 
-		int tri_Cp_B_Ap [3] = {vcp->id(),vb->id(),vap->id() }; 
-		int tri_Bp_Ap_C [3] = {vbp->id(),vap->id(),vc->id() }; 
-		int tri_Cp_Ap_Bp[3] = {vcp->id(),vap->id(),vbp->id()}; 
-
-		delegate.createFace(mesh,tri_A_Cp_Bp,newFaceIds++);*/
 	}
 
 
 	// Intermezzo: copy all vertices to a fresh mesh
-	for(SolidVertexIterator vi(mesh); !vi.end(); ++vi) {
+	int j=0;
+	for(SolidVertexIterator vi(mesh); !vi.end(); ++vi, j++) {
 		Solid::tVertex origV = *vi;
-
-
-
 		Vertex *genV = delegate.createVertex(refinedMesh, origV->id());
 		genV->point() = origV->point();
 		genV->id() = origV->id();
+		//genV->boundary() = true;
 	}
 
 
@@ -319,26 +308,28 @@ Solid* firstPass(Solid* original) {
 		
 		// we can now update the vertices with the new coordinates (phase 2)
 		//
-		// ODDS: VAp, VBp, VCp
-		// EVEN: VA, VB, VC
+		// ODDS: VAp, VBp, VCp - UPDATE FIRST!
+		// EVEN: VA, VB, VC - UPDATE SECOND!
 		//
 		vva  = refinedMesh->idVertex(va);
-		vvb  = refinedMesh->idVertex(va);
-		vvc  = refinedMesh->idVertex(va);
-		vvap = refinedMesh->idVertex(va);
-		vvbp = refinedMesh->idVertex(va);
-		vvcp = refinedMesh->idVertex(va);
+		vvb  = refinedMesh->idVertex(vb);
+		vvc  = refinedMesh->idVertex(vc);
+		vvap = refinedMesh->idVertex(vap);
+		vvbp = refinedMesh->idVertex(vbp);
+		vvcp = refinedMesh->idVertex(vcp);
 
 		op1_vap = refinedMesh->idVertex(oppositeVertOfEdge[vap]);
 		op2_vap = refinedMesh->idVertex(oppositeVertOfEdge[vap+ 6*nVert]);
+		assert(op1_vap!=op2_vap); // do not accept degenerate cases
 		op1_vbp = refinedMesh->idVertex(oppositeVertOfEdge[vbp]);
 		op2_vbp = refinedMesh->idVertex(oppositeVertOfEdge[vbp + 6*nVert]);
+		assert(op1_vbp!=op2_vbp); // do not accept degenerate cases
 		op1_vcp = refinedMesh->idVertex(oppositeVertOfEdge[vcp]);
 		op2_vcp = refinedMesh->idVertex(oppositeVertOfEdge[vcp + 6*nVert]);
-
+		assert(op1_vcp!=op2_vcp); // do not accept degenerate cases
 		
 
-		// UPDATING ODDS 1st
+		// UPDATING ODDS
 		//
 		//        A = 1/8
 		//       / \
@@ -352,14 +343,21 @@ Solid* firstPass(Solid* original) {
 		//       \ /
 		//        D = 1/8
 		//
+		// V = 0.125*(A+D) + 0.375*(C+B)
 		//
-		vvap->point() += (op1_vap->point()+op2_vap->point())*(1/8);
-		vvbp->point() += (op1_vbp->point()+op2_vbp->point())*(1/8);
-		vvcp->point() += (op1_vcp->point()+op2_vcp->point())*(1/8);
+		// Currently we have V = 0.375*(C+B). We need to add
+		// V+=0.125*(A+D) to get the correct point
+		//0.0635
+		// 
+	
+		//std::cout<<"\r\n\r\n\r\nAP, \t"<<op1_vap->point()[0]<<"\t\t"<<op2_vap->point()[1];
+		//std::cout<<"\r\nBP, \t"<<op1_vbp->point()[0]<<"\t\t"<<op2_vbp->point()[1];
+		//std::cout<<"\r\nCP, \t"<<op1_vcp->point()[0]<<"\t\t"<<op2_vcp->point()[1];
+		vvap->point() += ((op1_vap->point()+op2_vap->point())*0.125);
+		vvbp->point() += ((op1_vbp->point()+op2_vbp->point())*0.125);
+		vvcp->point() += ((op1_vcp->point()+op2_vcp->point())*0.125);
 		
-
-		// NOW WE CAN UPDATE THE EVEN.
-
+		
 		
 
 
@@ -369,31 +367,39 @@ Solid* firstPass(Solid* original) {
 		delegate.createFace(refinedMesh, tri_Bp_Ap_C,  splitFaceId++);
 		delegate.createFace(refinedMesh, tri_Cp_Ap_Bp, splitFaceId++);
 	}
-
+	
 	// all triangles created; update EVEN verts
-
-	// EVENS
+	// use REFINEDMESH, because the new neighbors will be there.
 	SolidVertexIterator originalV(refinedMesh);
-	// modify only the original vertices
 	for(int i=0; !originalV.end() && i<nVert; i++, ++originalV)  {	
 		Solid::tVertex vert = *originalV;
 
+		//=======================
 		// 1. sum neighbors
+		//=======================
 		Point summation = Point();
 		int nn=0;	//n neighbors
 		MeshLib::VertexVertexIterator neighbors(vert);
 		for (Solid::tVertex vn = *neighbors; !neighbors.end(); nn++, ++neighbors) summation+=vn->point();
 		double n = (double) nn;
+		
+		//=======================
 		// 2. calculate constant
-		double beta = (n>3) ? (3/(8*n)) : (3/16);
+		//=======================
+		double beta = (n>3) ? alphas[nn] : (3/16);
+		
 		//std::cout<<"\r\n i = "<<i<< " n= "<<n<< " beta= "<<beta<<"\t sum= "<<summation(0)<<", "<<summation(1)<<", "<<summation(2);
 			
+		//=======================
 		// 3. calculate and update with new position
+		//=======================
 		Point old = vert->point();
-		refinedMesh->idVertex(vert->id())->point() = old*(1-(n*beta)) + summation*beta;	
+		Point newpoint = old*(1-(beta*n)) + summation*beta;	
+		//if (n==2) newpoint = old*0.75 + summation*0.125;	//crease/boundary
+		refinedMesh->idVertex(vert->id())->point() = newpoint;
 	}
-
-
+	
+	
 	return refinedMesh;
 }
 
@@ -401,6 +407,9 @@ Solid* firstPass(Solid* original) {
 
 void main(int argc, char *argv[])
 {
+	alphas = new double[30];
+	for (int i=0;i<30;i++) alphas[i]=getAlpha(i);
+
 	// Read in the obj file
 	Solid mesh;
 	OBJFileReader of;
@@ -411,8 +420,9 @@ void main(int argc, char *argv[])
 		mesh = *firstPass(&mesh);
 		std::cout<<"\r\nFinished pass #"<<i+1<<", working..."; 
 	}
+	std::cout<<"\r\n\r\nDone!";
 
-	std::cout<<"\r\nDone!"; 
+
 
 	// Write out the resultant obj file
 	int vObjID = 1;
